@@ -7,6 +7,7 @@
 									##### How to use this driver #####
 	=================================================================== 
     @note
+			-# 使用bsp_spi_Init	启动spi传输
       -# 调用SPI_ReadWrite_8Byte 读写8字节数据
 			-# 调用SPI_ReadWrite_16Byte 读写16字节数据
     @attention
@@ -21,6 +22,14 @@
   ******************************************************************************
 */
 #include "bsp_spi.h"
+
+/**
+  * @brief  SPI初始化
+  */
+void bsp_spi_Init(SPI_TypeDef* SPIx)
+{
+	LL_SPI_Enable(SPIx);
+}
 
 /**
   * @brief  SPI读写(8byte)
@@ -78,3 +87,17 @@ uint16_t SPI_ReadWrite_16Byte(SPI_TypeDef* SPIx, uint16_t TxData)
 	return LL_SPI_ReceiveData16(SPIx);;
 
 }
+
+/**
+  * @brief  SPI速度设置
+	* @param  SPIx: SPI选择
+	* @param  SPI_BaudRatePrescaler: SPI速率
+  */
+void SPI_SetSpeed(SPI_TypeDef* SPIx, uint8_t Prescaler)
+{
+  assert_param(IS_SPI_BAUDRATE_PRESCALER(Prescaler));	//断言检查
+	SPI1->CR1&=0XFFC7;//位3-5清零，用来设置波特率
+	SPI1->CR1|=Prescaler;	
+	LL_SPI_Enable(SPIx);
+} 
+
