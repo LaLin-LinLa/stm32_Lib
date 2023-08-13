@@ -1,0 +1,68 @@
+/**
+  ******************************************************************************
+  * @file    bsp_dwt.h
+  * @author  Frederic Pillon
+  * @brief   Header for dwt.c module
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2019, STMicroelectronics
+  * All rights reserved.
+  *
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
+  *
+  ******************************************************************************
+  */
+
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef _BSP_DWT_H_
+#define _BSP_DWT_H_
+#include "stm32f4xx.h"
+#include <stdbool.h>
+
+#ifndef UNUSED
+#define UNUSED(x) (void)x
+#endif
+
+#ifdef DWT_BASE
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void dwt_access(bool ena);
+
+static inline uint32_t dwt_max_sec(void)
+{
+  return (UINT32_MAX / SystemCoreClock);
+};
+
+static inline uint32_t dwt_max_msec(void)
+{
+  return (UINT32_MAX / (SystemCoreClock / 1000));
+};
+
+static inline uint32_t dwt_max_usec(void)
+{
+  return (UINT32_MAX / (SystemCoreClock / 1000000));
+};
+
+static inline uint32_t dwt_getCycles(void)
+{
+  return (DWT->CYCCNT);
+};
+
+/*DWT_Delay_API*/
+uint32_t bsp_DWT_Init(void);
+void DWT_Delay_ms(uint32_t ms);
+void DWT_Delay_us(uint32_t us);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* DWT_BASE */
+#endif /* _DWT_H_ */
