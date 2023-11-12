@@ -31,6 +31,31 @@ void bsp_spi_Init(SPI_TypeDef* SPIx)
 	LL_SPI_Enable(SPIx);
 }
 
+void SPI_Delay(uint16_t t)
+{
+	while(t--);
+}
+
+/**
+	* @brief  SPI发送(8byte)
+  * @param  要发送的字节
+  */
+void SPI_Send_8Byte(SPI_TypeDef* SPIx, uint8_t TxData, uint16_t t)
+{
+	uint32_t timeout_cnt_num = 1000;
+	uint32_t timeout_cnt = 0;
+	while(!LL_SPI_IsActiveFlag_TXE(SPIx)){
+		timeout_cnt ++;
+		if(timeout_cnt > timeout_cnt_num){
+			break;
+		}
+	}
+
+	SPIx->DR = TxData;
+	SPI_Delay(t);
+}
+
+
 /**
   * @brief  SPI读写(8byte)
   * @param  要发送的字节
@@ -38,7 +63,7 @@ void bsp_spi_Init(SPI_TypeDef* SPIx)
   */
 uint8_t SPI_ReadWrite_8Byte(SPI_TypeDef* SPIx, uint8_t TxData)
 {
-	uint32_t timeout_cnt_num = 1000;
+	uint32_t timeout_cnt_num = 500;
 	uint32_t timeout_cnt = 0;
 	while(!LL_SPI_IsActiveFlag_TXE(SPIx)){
 		timeout_cnt ++;
@@ -67,7 +92,7 @@ uint8_t SPI_ReadWrite_8Byte(SPI_TypeDef* SPIx, uint8_t TxData)
   */
 uint16_t SPI_ReadWrite_16Byte(SPI_TypeDef* SPIx, uint16_t TxData)
 {
-	uint32_t timeout_cnt_num = 1000;
+	uint32_t timeout_cnt_num = 500;
 	uint32_t timeout_cnt = 0;
 	while(!LL_SPI_IsActiveFlag_TXE(SPIx)){
 		timeout_cnt ++;

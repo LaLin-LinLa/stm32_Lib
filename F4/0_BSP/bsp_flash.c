@@ -34,8 +34,6 @@
   * important is make sure the users will have clear and definite understanding 
   * through your new brief.
   *
-  * <h2><center>&copy; Copyright (c) 2019 - ~, SCUT-RobotLab Development Team.
-  * All rights reserved.</center></h2>
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/  
