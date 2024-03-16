@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "drv_usb_uart.h": "c",
+    "stdarg.h": "c",
+    "usbd_cdc_if.h": "c",
+    "cstdio": "c"
+  }
+}
