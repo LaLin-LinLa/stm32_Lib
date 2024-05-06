@@ -31,20 +31,20 @@ IIC_PIN_Typedef DRV_I2C3;
 
 /* SDA输入配置 */
 void xSDA_IN(IIC_PIN_Typedef *iic_pin)              		    
-{
+{	
 	if(iic_pin->IIC_SDA_PIN_NUM <= 7)
-	{iic_pin->IIC_SDA_GPIO_PORT->CRL &= 0x0fffffff;iic_pin->IIC_SDA_GPIO_PORT->CRL |= (uint32_t)8<<(iic_pin->IIC_SDA_PIN_NUM*4);}
+	{iic_pin->IIC_SDA_GPIO_PORT->CRL &= ~((0x0f<<4*iic_pin->IIC_SDA_PIN_NUM)&0xffffffff);iic_pin->IIC_SDA_GPIO_PORT->CRL |= (uint32_t)8<<(iic_pin->IIC_SDA_PIN_NUM*4);}
 	else
-	{iic_pin->IIC_SDA_GPIO_PORT->CRH &= 0x0fffffff;iic_pin->IIC_SDA_GPIO_PORT->CRH |= (uint32_t)8<<(iic_pin->IIC_SDA_PIN_NUM*4);}
+	{iic_pin->IIC_SDA_GPIO_PORT->CRH &= ~((0x0f<<4*(iic_pin->IIC_SDA_PIN_NUM-8))&0xffffffff);iic_pin->IIC_SDA_GPIO_PORT->CRH |= (uint32_t)8<<((iic_pin->IIC_SDA_PIN_NUM-8)*4);}
 }
 
 /* SDA输出配置 */
 void xSDA_OUT(IIC_PIN_Typedef *iic_pin)             		    
 {
 	if(iic_pin->IIC_SDA_PIN_NUM <= 7)
-	{iic_pin->IIC_SDA_GPIO_PORT->CRL &= 0x0fffffff;iic_pin->IIC_SDA_GPIO_PORT->CRL |= (uint32_t)3<<(iic_pin->IIC_SDA_PIN_NUM*4);}
+	{iic_pin->IIC_SDA_GPIO_PORT->CRL &= ~((0x0f<<4*iic_pin->IIC_SDA_PIN_NUM)&0xffffffff);iic_pin->IIC_SDA_GPIO_PORT->CRL |= (uint32_t)3<<(iic_pin->IIC_SDA_PIN_NUM*4);}
 	else
-	{iic_pin->IIC_SDA_GPIO_PORT->CRH &= 0x0fffffff;iic_pin->IIC_SDA_GPIO_PORT->CRH |= (uint32_t)3<<(iic_pin->IIC_SDA_PIN_NUM*4);}
+	{iic_pin->IIC_SDA_GPIO_PORT->CRH &= ~((0x0f<<4*(iic_pin->IIC_SDA_PIN_NUM-8))&0xffffffff);iic_pin->IIC_SDA_GPIO_PORT->CRH |= (uint32_t)3<<((iic_pin->IIC_SDA_PIN_NUM-8)*4);}
 }
 
 /* SCL输出电平 */
