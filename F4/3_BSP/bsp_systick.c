@@ -8,11 +8,8 @@
 	=================================================================== 
     @note
       -# 调用bsp_systick_Init初始化系统滴答定时器
-			-# 调用delay_us_sys以实现微秒级软件堵塞延时
-			-# 调用delay_ms_sys以实现毫秒级软件堵塞延时
-    @attention
-			-# 本模块为定时器堵塞式延时
-      -# 本模块仅支持LL库
+			-# 调用delay_us以实现微秒级软件堵塞延时
+			-# 调用delay_ms以实现毫秒级软件堵塞延时
   ******************************************************************************
   * @attention
   * 
@@ -24,48 +21,54 @@
 */
 #include "bsp_systick.h"
 
-static __IO uint32_t Time_cnt;
-
+static uint32_t fac_us=0;							//us延时倍乘数
 
 /**
   * @brief  系统滴答定时器 SysTick 初始化
-  * @param  temp	
+  * @param  ticks	
 	*					SystemFrequency / 1000    1ms中断一次
 	*					SystemFrequency / 100000	 10us中断一次
 	*					SystemFrequency / 1000000 1us中断一次
   * @retval 无
   */
-void bsp_systick_Init(uint32_t ticks)
+void bsp_systick_Init(uint8_t SYSCLK)
 {
-	if (HAL_SYSTICK_Config(SystemCoreClock / ticks))
-	{  
-		while (1);
-	}
+	HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);//SysTick频率为HCLK
+	fac_us=SYSCLK;
 }
 
 /**
-  * @brief   us延时程序,10us为一个单位
+  * @brief   ms延时程序,1ms为一个单位
   * @param  
-  *	@arg nTime: Delay_us( 1 ) 则实现的延时为 1 * 10us = 10us
   * @retval  无
   */
-void delay_us_sys(__IO uint32_t nTime)
+void delay_ms(__IO uint16_t nms)
 { 
-	Time_cnt = nTime;	
-
-	while(Time_cnt != 0);
+	uint32_t i;
+	for(i=0;i<nms;i++) delay_us(1000);
 }
 
 /**
-  * @brief  获取节拍程序
-  * @param  无
-  * @retval 无
-  * @attention  在 SysTick 中断函数 SysTick_Handler()调用
+  * @brief   us延时程序,1us为一个单位
+  * @param  
+  * @retval  无
   */
-void Update_TimingDelay(void)
-{
-	if (Time_cnt != 0x00)
-	{ 
-		Time_cnt--;
-	}
+void delay_us(__IO uint32_t nus)
+{ 
+	uint32_t ticks;
+	uint32_t told,tnow,tcnt=0;
+	uint32_t reload=SysTick->LOAD;				//LOAD的值	    	 
+	ticks=nus*fac_us; 						//需要的节拍数 
+	told=SysTick->VAL;        				//刚进入时的计数器值
+	while(1)
+	{
+		tnow=SysTick->VAL;	
+		if(tnow!=told)
+		{	    
+			if(tnow<told)tcnt+=told-tnow;	//这里注意一下SYSTICK是一个递减的计数器就可以了.
+			else tcnt+=reload-tnow+told;	    
+			told=tnow;
+			if(tcnt>=ticks)break;			//时间超过/等于要延迟的时间,则退出.
+		}  
+	};
 }
