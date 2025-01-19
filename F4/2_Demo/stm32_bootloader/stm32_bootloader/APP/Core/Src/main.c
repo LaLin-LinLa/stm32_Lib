@@ -108,7 +108,8 @@ int main(void)
 	bsp_uart1_init();
 	drv_LCD_Init();
 	LCD_Clear(WHITE);
-	POINT_COLOR=RED;//设置字体为红色 
+	POINT_COLOR=RED;//设置字体为红色
+  printf("Welcome!!\r\n");	
 	LCD_ShowString(30,50,200,16,16,"Explorer STM32F4");	
 	LCD_ShowString(30,70,200,16,16,"APP TEST");	
 	LCD_ShowString(30,90,200,16,16,"ATOM@ALIENTEK");

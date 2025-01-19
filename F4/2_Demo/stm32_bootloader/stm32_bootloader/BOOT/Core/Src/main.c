@@ -21,7 +21,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "drv_LCD.h"
 #include "bsp_key.h"
 #include "bsp_uart.h"
 #include "iap.h"
@@ -70,8 +69,8 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	uint8_t clearflag=0;
-	uint8_t key;
+	u8 t=5;
+	uint8_t key=0;
 	uint16_t oldcount=0;				    //老的串口接收数据值
 	uint32_t applenth=0;				    //接收到的app代码长度
   /* USER CODE END 1 */
@@ -98,6 +97,48 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	bsp_systick_init(168);
 	bsp_uart1_init();
+	
+	printf("Explorer STM32F4          \r\n");
+	printf("BOOT MODE                 \r\n");
+	printf("长按KEY_UP:更新固件       \r\n");
+	printf("若无操作五秒后进入默认固件\r\n");
+	while(1)
+	{
+		key=Key_Scan(0);
+		if(key == WKUP_PRES)
+		{
+			key=0;t=0;LED0(1);
+			printf("\r\n==========================\r\n");
+			printf("      进入固件更新模式          ");
+			printf("\r\n==========================\r\n");
+			printf("\r\n");
+			printf("Explorer STM32F4     \r\n");
+		  printf("BOOT MODE            \r\n");
+			printf("KEY_UP:Copy APP2FLASH\r\n");
+			printf("KEY0:Run FLASH APP   \r\n");
+			printf("KEY1:Erase SRAM APP  \r\n");
+			printf("1.上位机发送固件.bin文件\r\n");
+			printf("2.按下KEY_UP将sram内的固件加载至flash中\r\n");
+			printf("3.按下KEY_0运行flash内更新后的固件\r\n");
+			printf("正在等待用户程序\r\n");
+			break;	
+		}
+		printf("%d\r\n",t);
+		t--;
+		LED0(2);
+		delay_ms(1000);
+		if(t==0)
+		{
+			printf("开始执行FLASH用户代码!!\r\n");
+			if(((*(vu32*)(FLASH_APP1_ADDR+4))&0xFF000000)==0x08000000)//判断是否为0X08XXXXXX.
+			{	 
+				iap_load_app(FLASH_APP1_ADDR);//执行FLASH APP代码
+			}else 
+			{
+				printf("非FLASH应用程序,无法执行!\r\n");
+			}									 
+		}
+	}
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -114,6 +155,7 @@ int main(void)
 				printf("代码长度:%dBytes\r\n",applenth);
 			}else oldcount=USART_RX_CNT;			
 		}
+		delay_ms(10);
 		key=Key_Scan(0);
 		if(key==WKUP_PRES)	//WK_UP按键按下
 		{
@@ -126,25 +168,24 @@ int main(void)
 					printf("固件更新完成!\r\n");	
 				}else 
 				{
+			
 					printf("非FLASH应用程序!\r\n");
 				}
 			}else 
 			{
 				printf("没有可以更新的固件!\r\n");
-			}
-			clearflag=7;//标志更新了显示,并且设置7*300ms后清除显示									 
+			}					 
 		}
 		if(key==KEY0_PRES)	//KEY1按下
 		{
 			if(applenth)
-			{																	 
+			{															 
 				printf("固件清除完成!\r\n");    
 				applenth=0;
 			}else 
 			{
 				printf("没有可以清除的固件!\r\n");
 			}
-			clearflag=7;//标志更新了显示,并且设置7*300ms后清除显示									 
 		}
 		if(key==KEY1_PRES)	//KEY2按下
 		{
@@ -155,8 +196,8 @@ int main(void)
 			}else 
 			{
 				printf("非FLASH应用程序,无法执行!\r\n");
+		
 			}									 
-			clearflag=7;//标志更新了显示,并且设置7*300ms后清除显示	  
 		}
     /* USER CODE END WHILE */
 
