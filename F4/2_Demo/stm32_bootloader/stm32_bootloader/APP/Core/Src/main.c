@@ -73,13 +73,16 @@ static void MX_RTC_Init(void);
   */
 int main(void)
 {
+	
+  /* USER CODE BEGIN 1 */
+	SCB->VTOR = FLASH_BASE | 0x10000;//设置偏移量
 	RTC_TimeTypeDef RTC_TimeStruct;
   RTC_DateTypeDef RTC_DateStruct;
 	uint8_t tbuf[40];
 	uint8_t t=0;
 	uint8_t key=0;
-  /* USER CODE BEGIN 1 */
-	SCB->VTOR = FLASH_BASE | 0x10000;//设置偏移量
+	u16 oldcount=0;				    //老的串口接收数据值
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -124,6 +127,14 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+		if(USART_RX_CNT){
+			if(oldcount==USART_RX_CNT)//新周期内,没有收到任何数据,认为本次数据接收完成.
+			{
+				HAL_UART_Transmit(&huart1,(uint8_t*)USART_RX_BUF,USART_RX_CNT,1000);	//发送接收到的数据
+				USART_RX_CNT=0;
+			}else oldcount=USART_RX_CNT;			
+		}
+		
 		t++;
 		if((t%10)==0)	//每100ms更新一次显示数据
 		{

@@ -72,6 +72,10 @@ __asm void INTX_ENABLE(void)
 }
 //设置栈顶地址
 //addr:栈顶地址
+//__asm 是表示汇编的关键字，告诉编译器接下来的代码是汇编代码
+//addr为什么在函数内部没有用，但实际的地址确成功设置了？，addr 的值会默认存储到 r0 中
+//MSR 的作用是将通用寄存器的值传给状态寄存器，也就是将 r0 的值传给 MSP，而MSP是主堆栈指针，也就是说，将 r0 存的值传给主堆栈指针，实现设置栈顶地址。
+//BX r14 这条汇编语句是什么作用？
 __asm void MSR_MSP(u32 addr) 
 {
 	MSR MSP, r0 			//set Main Stack value

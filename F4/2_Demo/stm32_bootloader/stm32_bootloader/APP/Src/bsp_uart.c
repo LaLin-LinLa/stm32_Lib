@@ -34,7 +34,7 @@ int fputc(int ch, FILE *f)
 //bit13~0，	接收到的有效字节数目
 uint16_t USART_RX_STA=0;       	//接收状态标记	
 uint32_t USART_RX_CNT=0;			//接收的字节数 
-uint8_t USART_RX_BUF[USART_REC_LEN] __attribute__ ((at(0X20001000)));//接收缓冲,最大USART_REC_LEN个字节,起始地址为0X20001000.
+uint8_t USART_RX_BUF[USART_REC_LEN];
 
 void bsp_uart1_init(void)
 {
@@ -44,7 +44,7 @@ void bsp_uart1_init(void)
 void uart1_Rx_handler(void)
 {
 	uint8_t Res;
-	if((__HAL_UART_GET_FLAG(&huart1,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
+	if((__HAL_UART_GET_FLAG(&huart1,UART_FLAG_RXNE)!=RESET))  
 	{
 		 HAL_UART_Receive(&huart1,&Res,1,1000);
 		if(USART_RX_CNT<USART_REC_LEN)
